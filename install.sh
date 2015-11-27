@@ -48,14 +48,14 @@ if [ "${0##*/}" != "reno-properties" ]; then
   : "${RENO_YES:=}"
 
   echo "Reno installer"
-  [[ -e $RENO_BIN ]] && abort "Already exists $RENO_BIN."
+  [[ -e $RENO_BIN || -L $RENO_BIN ]] && abort "Already exists $RENO_BIN."
 
   if [[ $current && -e "$current/.RENO_DIR" ]]; then
     RENO_DIR=$current
     info
     confirm "Are you sure to install reno?" || exit 1
   else
-    [[ -e $RENO_DIR ]] && abort "Already exists $RENO_DIR."
+    [[ -e $RENO_DIR || -L $RENO_DIR ]] && abort "Already exists $RENO_DIR."
 
     if exists git; then
         info
@@ -70,7 +70,7 @@ if [ "${0##*/}" != "reno-properties" ]; then
       fi
 
       if [[ $fallback ]]; then
-        echo "Git not found. Uses curl instead."
+        echo "Git not found. Uses $fallback instead."
         info
         confirm "Are you sure to install reno via $fallback?" || exit 1
 
