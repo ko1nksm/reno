@@ -23,8 +23,8 @@ export RENO_MAX_DEPTH_OF_RECURSION=10
 
 export INFILL_DEFAULT="default"
 export INFILL_HIDE_NAME=
-export INFILL_BASE="infill"
-export INFILL_DIR="$HOME/.$INFILL_BASE"
+export INFILL_BASE=".infill"
+export INFILL_DIR="$HOME/$INFILL_BASE"
 export INFILL_VAR_DIR="$HOME/var/$INFILL_BASE"
 export INFILL_BACKUP_DIR="$HOME/var/backups/$INFILL_BASE"
 
