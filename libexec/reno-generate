@@ -38,7 +38,7 @@ id_ecdsa
 identity
 *.ppk
 DATA
-)"
+  )"
 }
 
 generate_readme() {
@@ -51,7 +51,62 @@ Please be careful when you fork.
 
 If you are interested in the reno, please refer to $project
 DATA
-)"
+  )"
+}
+
+generate_setup() {
+  local reno_repo=$(reno-properties REPOSITORY)
+  local infill_repo="YOUR-INFILL-REPOSITORY"
+  local infill_archive="YOUR-INFILL-ARCHIVE"
+  local installer=$(reno-properties INSTALLER)
+
+  if ! exists git; then
+    warn "infill repository not detected. [git not found]"
+  elif [[ ! -e "$INFILL_DIR" ]]; then
+    warn "infill repository not detected. [infill directory '$INFILL_DIR' not found]"
+  else
+    infill_repo=$(git -C "$INFILL_DIR" config --get remote.origin.url)
+  fi
+
+  generate "$INFILL_DIR/setup.sh" "$(cat <<DATA
+#!/usr/bin/env bash
+
+RENO_REPO="$reno_repo"
+INSTALLER="$installer"
+INFILL_REPO="$infill_repo"
+INFILL_ARCHIVE="$infill_archive"
+
+DATA
+cat <<'DATA'
+RENO_DIR="$HOME/.reno"
+INFILL_DIR="$HOME/.infill"
+
+if type git > /dev/null 2>&1; then
+  if [[ -e $RENO_DIR ]]; then
+    echo "Found reno directory. skipping reno installation."
+  else
+    git clone $RENO_REPO $RENO_DIR
+    $RENO_DIR/install.sh
+  fi
+  $RENO_DIR/bin/reno init $INFILL_REPO
+else
+  echo -n "Git not found. Do you want to import from an archive? [y/N] "
+  read input
+  [[ $input = "y" || $input = "Y" ]] || exit 1
+  if type curl > /dev/null 2>&1; then
+    bash -c "$(curl -L $INSTALLER)"
+  elif type wget > /dev/null 2>&1; then
+    bash -c "$(wget -O - $INSTALLER)"
+  else
+    echo "Not found git, wget, curl. Aborting"
+    exit 1
+  fi
+  $RENO_DIR/bin/reno init $INFILL_ARCHIVE --type archive
+fi
+DATA
+  )"
+
+  chmod +x "$INFILL_DIR/setup.sh"
 }
 
 func="generate_${1:-}"
