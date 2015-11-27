@@ -48,11 +48,6 @@ while (( $# > 0 )); do
          --dry-run) RENO_DRY_RUN=1 ;;
     -h | --help)    help=1 ;;
     --version)      exec "reno-properties" VERSION ;;
-    --infill-dir)
-      [[ ${2:-} ]] || abort "--infill-dir not specified path."
-      INFILL_DIR=$2
-      shift
-      ;;
     -*) params[${#params[@]}]=$1 ;;
     *) [[ $command ]] && params[${#params[@]}]=$1 || command=$1
   esac

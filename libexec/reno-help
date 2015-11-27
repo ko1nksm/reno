@@ -37,7 +37,6 @@ Usage: reno init [OPTIONS] [ REPOSITORY | ARCHIVE ]
 OPTIONS:
       --type TYPE       Import type [git (default), archive]
       --format FORMAT   Format of archive [tar.gz, zip] (Auto detect if not specified)
-      --infill-dir DIR  Specify infill directory location
   -y, --yes             Assume Yes to all queries
       --dry-run         Dry run and verbose
   -q, --quiet           Quiet
@@ -56,7 +55,6 @@ NAME:
 
 OPTIONS:
       --stdout          Display on stdout
-      --infill-dir DIR  Specify infill directory location
   -y, --yes             Assume Yes to all queries
       --dry-run         Dry run and verbose
   -q, --quiet           Quiet
@@ -73,7 +71,6 @@ NAME:
 
 OPTIONS:
   -u, --upgrade         Upgrade feature (Set RENO_UPGRADE=1)
-      --infill-dir DIR  Specify infill directory location
   -y, --yes             Assume Yes to all queries
       --dry-run         Dry run and verbose
   -q, --quiet           Quiet
@@ -89,7 +86,6 @@ NAME:
   feature or group name
 
 OPTIONS:
-      --infill-dir DIR  Specify infill directory location
   -y, --yes             Assume Yes to all queries
       --dry-run         Dry run and verbose
   -q, --quiet           Quiet
@@ -103,7 +99,6 @@ Usage: reno info [OPTIONS] [NAME]
 
 OPTIONS:
   -g, --global          Print global information
-      --infill-dir DIR  Specify infill directory location
 DATA
 }
 
@@ -113,7 +108,6 @@ Usage: reno list [OPTIONS]
   List installed files
 
 OPTIONS:
-      --infill-dir DIR  Specify infill directory location
   -c, --check           Check home directory (may take a few seconds)
   -f, --full            Display full path
 DATA
