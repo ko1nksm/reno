@@ -40,6 +40,10 @@ export RENO_TIME=$(date "+%Y%m%d%H%M%S")
 export RENO_DEPTH_OF_RECURSION=0
 export INFILL_INSTALLED_DIR="$INFILL_VAR_DIR/installed"
 
+if [[ $INFILL_BASE = */* ]]; then
+  abort "\$INFILL_BASE not allow slash."
+fi
+
 help=""
 command=""
 params=()
