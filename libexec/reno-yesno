@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+
+set -eu
+
+msg=${1:-}
+
+[[ ${RENO_YES:-} ]] && exit 0
+
+prompt="$msg [y/N]? "
+echo -n "$prompt"
+
+if [[ ${RENO_DRY_RUN:-} ]]; then
+  echo 'y'
+  exit 0
+fi
+
+while read input; do
+  ch=$(tr "[:upper:]" "[:lower:]" <<< "$input")
+  case $ch in
+    y) exit 0 ;;
+    n | "") exit 1 ;;
+  esac
+  echo -n "$prompt"
+done

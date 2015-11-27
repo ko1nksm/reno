@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+
+export RENO_DIR="${0%/*}/../../"
+export PATH="$RENO_DIR/libexec:$PATH"
+
+. bootstrap
+
+for i in $LIB/*; do
+  file=${i##*/}
+  import "${file%%.*}"
+done
+
+times=$1
+func=$2
+
+shift 2
+
+i=0
+start=$(date +%s%3N)
+
+if [[ ! -t 0 ]]; then
+  data=$(cat)
+  while (( i < times )); do
+    $func "$@" <<<"$data"
+    i=$((i + 1))
+  done
+else
+  while (( i < times )); do
+    $func "$@"
+    i=$((i + 1))
+  done
+fi
+
+end=$(date +%s%3N)
+diff=$((end - start))
+
+s=$((diff / 1000))
+ms=$((diff % 1000))
+
+printf "%s %d times: %d.%03ds\n" "$func" $i $s $ms >&2

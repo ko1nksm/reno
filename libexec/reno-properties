@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+source "$RENO_DIR/install.sh"
+
+echo "${!1:-}"

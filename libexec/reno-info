@@ -1,0 +1,108 @@
+#!/usr/bin/env bash
+
+. bootstrap
+
+import "infill" "feature" "group" "renoattributes"
+
+title() { echo -e "\033[32m==== $1 ====\033[m"; }
+subject() { echo -e "\033[32m[$1]\033[m"; }
+contents() {
+  title "$1"
+  [[ -f $2 ]] && readfile "$2" || echo "(not exists)"
+  echo
+}
+dispif() {
+  local status=$? value
+  (( status == 0 )) && value=$2 || value=$3
+  # shellcheck disable=SC2059
+  printf "$1" "$value"
+}
+
+if [[ ${1:-} = "-g" || ${1:-} = "--global" ]]; then
+  contents ".renorc (HOME)" "$HOME/Renofile"
+  contents ".renorc (INFILL_DIR)" ".renorc"
+  contents ".renoignore" "$INFILL_DIR/.renoignore"
+  exit 0
+fi
+
+if [[ ! ${1:-} ]]; then
+  cd "$INFILL_DIR"
+
+  subject "Environments"
+  echo "INFILL_DEFAULT: $INFILL_DEFAULT"
+  echo "INFILL_DIR    : $INFILL_DIR"
+  echo
+
+  subject "Global files"
+  [[ -e "$HOME/.renorc" ]] &&:
+  dispif ".renorc     (HOME)      : %s\n" "exists" "none"
+  [[ -e ".renorc" ]] &&:
+  dispif ".renorc     (INFILL_DIR): %s\n" "exists" "none"
+  [[ -e ".renoignore" ]] &&:
+  dispif ".renoignore (INFILL_DIR): %s\n" "exists" "none"
+  echo
+
+  subject "Available features"
+  echo "  name                 Renofile .renoignore .renoattributes Files"
+  echo "- -------------------- -------- ----------- --------------- -----"
+
+  while readline name; do
+    [[ -f "$INFILL_INSTALLED_DIR/$name" ]] &&:
+    dispif "%s " "*" " "
+    printf "%-20s " "$name"
+    [[ -e "$name/Renofile" ]] &&:
+    dispif "%-8s " "exists" "-"
+    [[ -e "$name/.renoignore" ]] &&:
+    dispif "%-11s " "exists" "-"
+    [[ -e "$name/.renoattributes" ]] &&:
+    dispif "%-15s " "exists" "-"
+    files_count=$(lines < <(find_feature_files "$name"))
+    (( files_count > 0 )) &&:
+    dispif "%5s\n" "$files_count" "-"
+  done < <(list_infill --feature)
+  echo
+  echo "[*] installed"
+  echo
+
+  subject "Group files"
+  echo "name                 Contained features"
+  echo "-------------------- ------------------------------------------"
+  while readline name; do
+    printf "%-20s %s\n" "$name" "$(read_group_file --oneline "$name")"
+  done < <(list_infill --group)
+  echo
+  exit 0
+fi
+
+name=$1
+
+if exists_group "$name"; then
+  title "Group"
+  readfile "$INFILL_DIR/$name"
+  exit 0
+fi
+
+if exists_feature "$name" ]]; then
+  cd "$INFILL_DIR/$name"
+
+  title "Status"
+  install_params=$(readfile "$INFILL_INSTALLED_DIR/$name")
+  is_installed "$name" &&:
+  dispif "%s\n\n" "Installed: $name $install_params" "Not installed"
+
+  contents "Renofile" "Renofile"
+  contents ".renoignore" ".renoignore"
+  contents ".renoattributes" ".renoattributes"
+
+  title "Files"
+  renoattributes=$(readfile ".renoattributes")
+  while readline file; do
+    attr=$(attributes_matching "$file" <<< "$renoattributes")
+    [[ -d "$file" ]] && file="$file/"
+    puts "$file${attr:+ [$attr]}"
+  done < <(find_feature_files "$name")
+  echo
+  exit 0
+fi
+
+abort "Not found feature or group '$name'"

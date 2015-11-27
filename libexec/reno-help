@@ -1,0 +1,143 @@
+#!/usr/bin/env bash
+
+. bootstrap
+
+help_usage() {
+cat <<DATA
+Usage: reno COMMAND [OPTIONS]
+       reno [ -h | --help | --version ]
+
+COMMAND:
+  init          Initialize infill directory
+  generate      Generate file to infill directory
+
+  install       Install feature
+  uninstall     Uninstall feature
+
+  info          Show infill information
+  list          List installed files
+
+  env           Show reno environment variables
+  help          Display command's help
+
+OPTIONS:
+  -h, --help    Display usage
+      --version Display version
+
+Run 'reno COMMAND --help' for more information on a command.
+
+DATA
+}
+
+help_init() {
+cat <<DATA
+Usage: reno init [OPTIONS] [ REPOSITORY | ARCHIVE ]
+  Generate infill directory
+
+OPTIONS:
+      --type TYPE       Import type [git (default), archive]
+      --format FORMAT   Format of archive [tar.gz, zip] (Auto detect if not specified)
+      --infill-dir DIR  Specify infill directory location
+  -y, --yes             Assume Yes to all queries
+      --dry-run         Dry run and verbose
+  -q, --quiet           Quiet
+DATA
+}
+
+help_generate() {
+cat <<DATA
+Usage: reno generate [OPTIONS] NAME
+  Generate file to infill directory
+
+NAME:
+  readme                Generate README.md
+  gitignore             Generate .gitignore
+  setup                 Generate setup.sh
+
+OPTIONS:
+      --stdout          Display on stdout
+      --infill-dir DIR  Specify infill directory location
+  -y, --yes             Assume Yes to all queries
+      --dry-run         Dry run and verbose
+  -q, --quiet           Quiet
+DATA
+}
+
+help_install() {
+cat <<DATA
+Usage: reno install [NAME] [OPTIONS] [-- PARAMS...]
+  Install feature
+
+NAME:
+  feature or group name
+
+OPTIONS:
+  -u, --upgrade         Upgrade feature (Set RENO_UPGRADE=1)
+      --infill-dir DIR  Specify infill directory location
+  -y, --yes             Assume Yes to all queries
+      --dry-run         Dry run and verbose
+  -q, --quiet           Quiet
+DATA
+}
+
+help_uninstall() {
+cat <<DATA
+Usage: reno install [NAME] [OPTIONS] [-- PARAMS...]
+  Uninstall feature
+
+NAME:
+  feature or group name
+
+OPTIONS:
+      --infill-dir DIR  Specify infill directory location
+  -y, --yes             Assume Yes to all queries
+      --dry-run         Dry run and verbose
+  -q, --quiet           Quiet
+DATA
+}
+
+help_info() {
+cat <<DATA
+Usage: reno info [OPTIONS] [NAME]
+  Show information and infill definitions.
+
+OPTIONS:
+  -g, --global          Print global information
+      --infill-dir DIR  Specify infill directory location
+DATA
+}
+
+help_list() {
+cat <<DATA
+Usage: reno list [OPTIONS]
+  List installed files
+
+OPTIONS:
+      --infill-dir DIR  Specify infill directory location
+  -c, --check           Check home directory (may take a few seconds)
+  -f, --full            Display full path
+DATA
+}
+
+help_env() {
+cat <<DATA
+Usage: reno env [ -s ] [NAME]
+  Show reno environment variables
+
+OPTIONS:
+  -s, --system  Include system environment
+DATA
+}
+
+help_help() {
+cat <<DATA
+Usage: reno help [COMMAND]
+  Display command's help
+DATA
+}
+
+func="help_${1:-usage}"
+
+exists "$func" || abort "'$1' help not found"
+
+$func

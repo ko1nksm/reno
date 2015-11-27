@@ -1,0 +1,86 @@
+#!/usr/bin/env bash
+
+# change the current directory to the location where self is
+# readlink -f not supported in some environment.
+while [[ ${self=$0} ]]; do
+  cd "${self%/*}"
+  self=$(readlink "${self##*/}")
+done
+cd ..
+
+export RENO_DIR=$PWD
+export PATH="$RENO_DIR/libexec:$PATH"
+
+. bootstrap
+
+import "infill"
+
+# overridable variables in renorc
+export RENO_YES=""
+export RENO_QUIET=""
+export RENO_UPGRADE=""
+export RENO_MAX_DEPTH_OF_RECURSION=10
+
+export INFILL_DEFAULT="default"
+export INFILL_HIDE_NAME=
+export INFILL_BASE="infill"
+export INFILL_DIR="$HOME/.$INFILL_BASE"
+export INFILL_VAR_DIR="$HOME/var/$INFILL_BASE"
+export INFILL_BACKUP_DIR="$HOME/var/backups/$INFILL_BASE"
+
+source "libexec/renorc"
+:source "$HOME/.renorc"
+
+# non-overridable variable
+export RENO_DRY_RUN=""
+export RENO_TIME=$(date "+%Y%m%d%H%M%S")
+export RENO_DEPTH_OF_RECURSION=0
+export INFILL_INSTALLED_DIR="$INFILL_VAR_DIR/installed"
+
+help=""
+command=""
+params=()
+while (( $# > 0 )); do
+  case $1 in
+    -y | --yes)     RENO_YES=1 ;;
+    -q | --quiet)   RENO_QUIET=1 ;;
+    -u | --upgrade) RENO_UPGRADE=1 ;;
+         --dry-run) RENO_DRY_RUN=1 ;;
+    -h | --help)    help=1 ;;
+    --version)      exec "reno-properties" VERSION ;;
+    --infill-dir)
+      [[ ${2:-} ]] || abort "--infill-dir not specified path."
+      INFILL_DIR=$2
+      shift
+      ;;
+    -*) params[${#params[@]}]=$1 ;;
+    *) [[ $command ]] && params[${#params[@]}]=$1 || command=$1
+  esac
+  shift
+done
+
+INFILL_DIR=$(normpath "$INFILL_DIR")
+
+:source "$INFILL_DIR/.renorc"
+
+if [[ ! $command || $help ]]; then
+  exec reno-help "$command"
+fi
+
+if contains "$command" "install" "uninstall"; then
+  params=("$command" "${params[@]:-}")
+  command="feature"
+fi
+
+exists "reno-$command" || abort "no such command '$command'"
+
+if ! contains "$command" "init" "env" "help"; then
+  if [[ ! -d $INFILL_DIR ]]; then
+    abort "Not found infill directory '$INFILL_DIR'. Run 'reno init'"
+  fi
+  if [[ ! -f "$INFILL_DIR/.INFILL_DIR" ]]; then
+    abort "$INFILL_DIR is not infill directory. (.INFILL_DIR file not found)"
+  fi
+fi
+
+exec "reno-$command" "${params[@]:-}"

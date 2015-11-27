@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+set -eu
+
+cd "${0%/*}/.."
+
+exec bats ${CI:+--tap} test
+

@@ -1,0 +1,61 @@
+#!/usr/bin/env bash
+
+. bootstrap
+
+project=$(reno-properties PROJECT)
+
+stdout=""
+for option in "$@"; do
+  case $option in
+    --stdout) shift; stdout=1 ;;
+    *) break
+  esac
+done
+
+generate() {
+  local file=$1
+  local data=$2
+
+  if [[ $stdout ]];then
+    puts "$data"
+    return 0
+  fi
+
+  if [[ -e $file ]]; then
+    reno-yesno "Already exists file. Overwrite it? [$file] " || return 1
+  fi
+
+  run mkfile "$file" "$data"
+  info "$file generated."
+}
+
+generate_gitignore() {
+  generate "$INFILL_DIR/.gitignore" "$(cat <<DATA
+# Do not recommend the management of secret files.
+id_rsa
+id_dsa
+id_ecdsa
+identity
+*.ppk
+DATA
+)"
+}
+
+generate_readme() {
+  generate "$INFILL_DIR/README.md" "$(cat <<DATA
+This is an infill directory of the reno a home directory management tool.
+
+Infill directory might be contained personal data.
+
+Please be careful when you fork.
+
+If you are interested in the reno, please refer to $project
+DATA
+)"
+}
+
+func="generate_${1:-}"
+
+exists "$func" || abort "Unknown generator name '$1'"
+
+$func

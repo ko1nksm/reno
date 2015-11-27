@@ -1,0 +1,19 @@
+set -eu
+
+# bash < 3.0 not support pipefail
+set -o pipefail 2> /dev/null &&:
+
+LIB="$RENO_DIR/libexec/lib"
+
+import() {
+  local i loaded_name
+  for i in "$@"; do
+    [[ $i ]] || continue
+    loaded_name="loaded_$i"
+    [[ ${!loaded_name:-} ]] && continue
+    let $loaded_name=1
+    . "$LIB/$i.sh"
+  done
+}
+
+import "general" "path" "process"

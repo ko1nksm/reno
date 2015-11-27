@@ -1,0 +1,5 @@
+[install]
+touch $HOME/feature
+
+[uninstall]
+rm $HOME/feature

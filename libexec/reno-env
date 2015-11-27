@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+
+. bootstrap
+
+import "infill" "stat" "symlink" "cmp"
+
+system=""
+if [[ ${1:-} = "-s" || ${1:-} = "--system" ]]; then
+  system=1
+elif [[ ${1:-} ]]; then
+  defined "$1" && puts "${!1}"
+  exit
+fi
+
+disp() {
+  [[ ${1:-} = "s" && ! $system ]] && return
+  [[ ${2:-} = "e" && ${!3:-} = "" ]] && return
+  printf "%-27s: %s\n" "${3:-}" "${!3:-}"
+}
+
+disp - - HOME
+disp s e MSYS
+disp s e CYGWIN
+disp
+disp - - RENO_DIR
+disp - - RENO_UPGRADE
+disp - - RENO_YES
+disp s - RENO_DRY_RUN
+disp - - RENO_QUIET
+disp - - RENO_MAX_DEPTH_OF_RECURSION
+disp
+disp s - RENO_SUPPORT_CMP
+disp s - RENO_SUPPORT_DIFF
+disp s - RENO_SUPPORT_STAT
+disp s - RENO_SUPPORT_READLINKF
+disp s
+disp - - INFILL_DEFAULT
+disp - - INFILL_HIDE_NAME
+disp - - INFILL_BASE
+disp - - INFILL_DIR
+disp - - INFILL_VAR_DIR
+disp - - INFILL_BACKUP_DIR

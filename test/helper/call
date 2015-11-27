@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+export RENO_DIR="${0%/*}/../../"
+export PATH="$RENO_DIR/libexec:$PATH"
+
+. bootstrap
+
+for i in $LIB/*; do
+  file=${i##*/}
+  import "${file%%.*}"
+done
+
+output=""
+if [[ ${1:-} = "--output" ]]; then
+  output=1
+  shift
+fi
+
+func=$1
+shift
+$func "$@"
+
+if [ $output ]; then
+  printf "%s" "$OUTPUT"
+fi

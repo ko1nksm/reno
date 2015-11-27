@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+set -eu
+
+cd "${0%/*}/.."
+
+list() {
+  find ./ -maxdepth 1 -type f -name *.sh
+  find ./bin -type f
+  find ./libexec -type f
+  find ./test/helper -type f
+}
+
+if (( $# )); then
+  list=$(for i in "$@"; do echo "$i"; done)
+else
+  list=$(list | sort)
+fi
+
+if [[ $list ]]; then
+  index=1
+  echo "$index..$(wc -l <<< "$list")"
+  while IFS= read -r file; do
+    shellcheck -s bash "$file"
+    echo "ok $((index++)) ${file:2}"
+  done <<< "$list"
+fi

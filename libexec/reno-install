@@ -1,0 +1,101 @@
+#!/usr/bin/env bash
+
+. bootstrap
+
+import "infill" "feature" "renofile" "renoattributes" "stat" "template"
+
+name=$1
+shift
+
+exists_feature "$name" || abort "Not found feature '$name'"
+
+for option in "$@"; do
+  case $option in
+    --) shift; break ;;
+    *) abort "no such option '$option'"
+  esac
+done
+
+load_renofile_env "$name"
+
+run_renofile "$name" "install:before" "$@"
+run_renofile "$name" "install" "$@"
+
+renoattributes=$(readfile "$INFILL_DIR/$name/.renoattributes")
+
+while readline -u 3 file; do
+  mode="soft"
+  mask=""
+  src="$INFILL_DIR/$name/$file"
+  dest="$HOME/$file"
+
+  [[ $mode = "hard" && -d $src ]] && mode="soft"
+
+  attr=$(attributes_matching "$file" <<< "$renoattributes")
+  get_attr "$attr" mode mask
+
+  if [[ -e $dest ]]; then
+    result=$(compare_feature_file "$src" "$dest") &&:
+    case $result in
+      "")
+        if [[ $mode = "tmpl" ]]; then
+          if [[ "$(template "$src")" = "$(readfile "$dest")" ]]; then
+            mode="skip"
+            break
+          fi
+        fi
+
+        reno-yesno "Replace to a file/directory in infill? [$dest]" || continue
+        if [[ $INFILL_BACKUP_DIR ]]; then
+          backup_dir="$INFILL_BACKUP_DIR/$RENO_TIME"
+          run mkdir "$backup_dir"
+          run mv "$dest" "$backup_dir/$file"
+        fi
+        ;;
+      same)
+        abort "The following two files are the same." \
+            "Contains a symbolic link in the path? \n $src \n $dest"
+        ;;
+      $mode) mode="skip" ;;
+      *) run rm "$dest" ;;
+    esac
+  elif [[ -L $dest ]]; then
+    run rm "$dest" # broken symlink
+  fi
+
+  run mkdir "${dest%/*}"
+  case $mode in
+    skip) ;;
+    soft) symlink "$src" "$dest" ;;
+    hard)
+      if ! run ln "$src" "$dest"; then
+        run cp -a "$src" "$dest"
+        warn "Create hardlink failed. fallback to copy. $src"
+      fi
+      ;;
+    copy) run cp -a "$src" "$dest" ;;
+    tmpl | tmpl=*)
+      if [[ -d "$src" ]]; then
+        abort "tmpl mode can not be used in the directory '$src'"
+      fi
+      template "$src" "$dest"
+      ;;
+    *) abort "Unknown install mode '$mode' at '$src'"
+  esac
+
+  if [[ $mask ]]; then
+    perm=$(get_perm "$src")
+    new_perm=$(printf "%04o" $((8#$perm & 8#$mask)))
+    if [[ $perm != $new_perm ]]; then
+      run chmod "$new_perm" "$src"
+      if [[ $new_perm != $(get_perm "$src") ]]; then
+        warn "Change permission failed. [$src ($perm => $new_perm)]"
+      fi
+    fi
+  fi
+done 3< <(find_feature_files "$name")
+
+run_renofile "$name" "install:after" "$@"
+
+run mkdir "$INFILL_INSTALLED_DIR"
+run mkfile "$INFILL_INSTALLED_DIR/$name" "$(shquote "$@")"

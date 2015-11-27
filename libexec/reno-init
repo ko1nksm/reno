@@ -1,0 +1,85 @@
+#!/usr/bin/env bash
+
+. bootstrap
+
+import "archive"
+
+type="git"
+format=""
+params=()
+while (( $# > 0 )); do
+  case $1 in
+    --type)
+      [[ ${2:-} ]] || abort "--type not specified TYPE."
+      type=$2
+      shift
+      ;;
+    --format)
+      [[ ${2:-} ]] || abort "--format not specified FORMAT."
+      format=$2
+      shift
+      ;;
+    -*) abort "no such option '$1'" ;;
+    *)
+      params[${#params[@]}]=$1 
+  esac
+  shift
+done
+
+init_via_git() {
+  exists git || abort "Git is required."
+  run git clone "$1" "$INFILL_DIR"
+}
+
+init_via_archive() {
+  local path=$1
+
+  local filename=${path##*/}
+  local ext=${filename#*.}
+  local format=${format:-$ext}
+
+  local tempfile=""
+
+  if [[ $path = "http://"* || $path = "https://"* ]]; then
+    tempfile=$(mktemp)
+    if exists curl; then
+      # shellcheck disable=SC2086
+      run curl ${RENO_CURL_OPTS:-} -L "$1" -o "$tempfile"
+    elif exists wget; then
+      # shellcheck disable=SC2086
+      run wget ${RENO_WGET_OPTS:-} -nv "$1" -O "$tempfile"
+    else
+      rm "$tempfile"
+      abort "wget or curl is required."
+    fi
+    path=$tempfile
+  fi
+
+  extract "$format" "$path" "$INFILL_DIR"
+
+  if [[ $tempfile ]]; then
+    run rm "$tempfile"
+    [[ $RENO_DRY_RUN ]] && rm "$tempfile"
+  fi
+
+  return 0
+}
+
+[[ -d $INFILL_DIR ]] && abort "$INFILL_DIR directory already exists."
+
+import_from=${params[0]:-}
+
+if [[ $import_from ]]; then
+  case $type in
+    git)     init_via_git "$import_from" ;;
+    archive) init_via_archive "$import_from" ;;
+    *) abort "Unknown protocol '$type'"
+  esac
+  info "$INFILL_DIR directory imported."
+else
+  run mkdir "$INFILL_DIR"
+  run touch "$INFILL_DIR/.INFILL_DIR"
+  info "$INFILL_DIR directory created."
+  reno-generate "readme"
+  reno-generate "gitignore"
+fi

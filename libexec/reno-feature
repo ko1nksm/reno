@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+
+. bootstrap
+
+import "infill" "group"
+
+indent=$(printf "%${RENO_DEPTH_OF_RECURSION}s")
+if ((RENO_DEPTH_OF_RECURSION++ > RENO_MAX_DEPTH_OF_RECURSION)); then
+  abort "Maximum recursion limit of $RENO_MAX_DEPTH_OF_RECURSION reached"
+fi
+
+command=$1
+name=${2:-$INFILL_DEFAULT}
+
+[[ ${2:-} ]] && shift
+shift
+
+if exists_group "$name"; then
+  info "$indent$name group"
+  ret=0
+  while IFS=" " read -u 3 -r -a fields; do
+    (( ${#fields[@]} )) && fields=(${fields[0]} -- "${fields[@]:1}")
+    eval "$0 $command ${fields[*]}" || ret=1
+  done 3< <(read_group_file "$name")
+  exit $ret
+fi
+
+if exists_feature "$name"; then
+  info "$indent$command $name"
+  exec "reno-$command" "$name" "$@"
+fi
+
+abort "Not found feature/group '$name'"

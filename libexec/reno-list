@@ -1,0 +1,155 @@
+#!/usr/bin/env bash
+
+. bootstrap
+
+import "feature" "renofile" "stat" "template"
+
+full="" check=""
+
+for option in "$@"; do
+  case $option in
+    -f | --full) full=1 ;;
+    -c | --check) check=1 ;;
+    -*) abort "no such option '$option'" ;;
+    *) break
+  esac
+done
+
+installed_files() {
+  local path name
+  for path in "$INFILL_INSTALLED_DIR/"*; do
+    name=${path##*/}
+    [[ ! -d "$INFILL_DIR/$name" ]] && continue
+    find_feature_files --full "$name"
+  done
+}
+
+home_files() {
+  local list=$(find "$HOME" -type l)
+  local lines=$(( $(wc -l <<< "$list") ))
+  local file link path
+
+  local i=0 seconds=$SECONDS
+  local msg="Checking symbolic link in home. take a few seconds."
+  printf "\r$msg (%d/%d) " $i $lines >&2
+
+  statNY <<< "$list" | while IFS=$TAB read -r file link; do
+    i=$((i + 1))
+    if (( SECONDS > seconds )); then
+      printf "\r$msg (%d/%d) " $i $lines >&2
+      seconds=$SECONDS
+    fi
+
+    [[ $file = "$INFILL_DIR/"* ]] && continue
+
+    [[ $link = "/"* ]] || link="${file%/*}/$link"
+    puts "$link"
+
+    if [[ ${file##*/} != ${link##*/} ]]; then
+      puts "${link%/*}/${file##*/}" # invalid link
+    fi
+  done | while readline path; do
+    normpath "$path"
+  done | while readline path; do
+    [[ $path = "$INFILL_DIR/"* ]] || continue
+    puts "$path"
+  done
+
+  printf "\r%80s\r" >&2
+}
+
+get_info() {
+  local installed=$1
+  local target=$2
+
+  local result="" status=""
+
+  # global variables
+  mark="" from_status="" to_status="" attrs=""
+
+  if [[ -e $installed && -e $target ]]; then
+    result=$(compare_feature_file "$installed" "$target") &&:
+
+    if [[ ! $result ]]; then
+      result=$(
+        set -eu
+        load_renofile_env "$name"
+        if [[ "$(template "$target")" = "$(readfile "$installed")" ]]; then
+          echo "tmpl"
+        fi
+      )
+    fi
+
+    if [[ $result ]]; then
+      mark="*"
+      status=$result
+    else
+      mark="!"
+      from_status="changed"
+      [[ -L $installed ]] && status="soft" || status="file"
+    fi
+    attrs="$status,$(get_perm "$installed")"
+    if [[ ! -f "$INFILL_INSTALLED_DIR/$name" ]]; then
+      mark="!"
+      from_status="not install"
+    fi
+  else
+    mark='?'
+
+    if [[ -e $installed ]]; then
+      from_status="invalid link"
+    elif [[ -L $installed ]]; then
+      from_status="broken link"
+    else
+      from_status="none"
+    fi
+
+    if [[ -e $target ]]; then
+      to_status=""
+    elif [[ -L $target ]] ; then
+      to_status="broken link"
+    else
+      to_status="none"
+    fi
+  fi
+}
+
+infill_name=${INFILL_DIR#$HOME/}
+
+files=$(
+  set -e
+  if [[ -d $INFILL_INSTALLED_DIR ]]; then installed_files; fi
+  if [[ $check ]]; then home_files; fi
+)
+
+while readline path; do
+  [[ $path ]] || continue
+
+  path=${path#$INFILL_DIR/}
+  name=${path%%/*}
+  file=${path#*/}
+
+  installed="$HOME/$file"
+  target="$INFILL_DIR/$name/$file"
+
+  # get_info sets value to global variables
+  # $mark, $from_status, $to_status, $attrs
+  get_info "$installed" "$target"
+
+  [[ $full ]] && from=$installed || from=$file
+  [[ $full ]] && to=$target || to="$infill_name/$name/$file"
+  [[ -d $installed ]] && from="$from/"
+  [[ -d $target ]] && to="$to/"
+
+  case $mark in
+    \?) color=$RED ;;
+    \*) color=$GREEN ;;
+    \!) color=$YELLOW ;;
+  esac
+  disp_from="${color}${from}${from_status:+ ($from_status)}${RESET}"
+
+  [[ $to_status ]] && color=$RED || color=$CYAN
+  disp_to="${color}${to}${to_status:+ ($to_status)}${RESET}"
+
+  echo -e "$mark $disp_from -> $disp_to${attrs:+ [$attrs]}"
+done < <(sort -u <<< "$files")
