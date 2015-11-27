@@ -1,0 +1,12 @@
+TEST_HOST=github.com
+TEST_RENO_REPO=https://github.com/ko1nksm/reno.git
+TEST_INFILL_REPO=https://github.com/ko1nksm/infill-sample.git
+
+TEST_RENO_INSTALLER=https://github.com/ko1nksm/reno/raw/master/install.sh
+TEST_RENO_ARCHIVE=https://github.com/ko1nksm/reno/archive/master.tar.gz
+TEST_INFILL_ARCHIVE=https://github.com/ko1nksm/infill-sample/archive/master.tar.gz
+
+# TEST_WGET_OPTS=
+# TEST_CURL_OPTS=
+
+RENO_YES=1
