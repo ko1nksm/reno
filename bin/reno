@@ -15,21 +15,24 @@ export PATH="$RENO_DIR/libexec:$PATH"
 
 import "infill"
 
-# overridable variables in renorc
-export RENO_YES=""
-export RENO_QUIET=""
-export RENO_UPGRADE=""
-export RENO_MAX_DEPTH_OF_RECURSION=10
-
-export INFILL_DEFAULT="default"
-export INFILL_HIDE_NAME=
-export INFILL_BASE=".infill"
-export INFILL_DIR="$HOME/$INFILL_BASE"
-export INFILL_VAR_DIR="$HOME/var/$INFILL_BASE"
-export INFILL_BACKUP_DIR="$HOME/var/backups/$INFILL_BASE"
-
 source "libexec/renorc"
 :source "$HOME/.renorc"
+
+# overridable variables in renorc
+export RENO_YES=${RENO_YES:-}
+export RENO_QUIET=${RENO_QUIET:-}
+export RENO_UPGRADE=${RENO_UPGRADE:-}
+export RENO_MAX_DEPTH_OF_RECURSION=${RENO_MAX_DEPTH_OF_RECURSION:-10}
+export INFILL_DEFAULT=${INFILL_DEFAULT:-default}
+export INFILL_HIDE_NAME=${INFILL_HIDE_NAME:-}
+export INFILL_BASE=${INFILL_BASE:-.infill}
+export INFILL_DIR=${INFILL_DIR:-$HOME/$INFILL_BASE}
+export INFILL_VAR_DIR=${INFILL_VAR_DIR:-$HOME/var/$INFILL_BASE}
+export INFILL_BACKUP_DIR=${INFILL_BACKUP_DIR:-$HOME/var/backups/$INFILL_BASE}
+
+INFILL_DIR=$(normpath "$INFILL_DIR")
+
+:source "$INFILL_DIR/.renorc"
 
 # non-overridable variable
 export RENO_DRY_RUN=""
@@ -53,10 +56,6 @@ while (( $# > 0 )); do
   esac
   shift
 done
-
-INFILL_DIR=$(normpath "$INFILL_DIR")
-
-:source "$INFILL_DIR/.renorc"
 
 if [[ ! $command || $help ]]; then
   exec reno-help "$command"
