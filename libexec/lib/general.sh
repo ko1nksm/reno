@@ -25,8 +25,12 @@ store() {
 }
 
 store_shim() {
+  # Do not inline quote variable
+  # bash 4.2.25 is not handled correctly
+
   # shellcheck disable=SC2086
-  eval $1="'${2//\'/"'\''"}'"
+  local quote="'\''"
+  eval $1="'${2//\'/$quote}'"
 }
 
 # printf -v not supported by bash 2.x
