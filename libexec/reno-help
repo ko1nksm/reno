@@ -36,7 +36,7 @@ Usage: reno init [OPTIONS] [ REPOSITORY | ARCHIVE ]
 
 OPTIONS:
       --type TYPE       Import type [git (default), archive]
-      --format FORMAT   Format of archive [tar.gz, zip] (Auto detect if not specified)
+      --format FORMAT   Format of archive [auto (default), tar.gz, zip]
   -y, --yes             Assume Yes to all queries
       --dry-run         Dry run and verbose
   -q, --quiet           Quiet

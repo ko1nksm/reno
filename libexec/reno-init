@@ -5,7 +5,7 @@
 import "archive"
 
 type="git"
-format=""
+format="auto"
 params=()
 while (( $# > 0 )); do
   case $1 in
@@ -33,10 +33,13 @@ init_via_git() {
 
 init_via_archive() {
   local path=$1
+  local format=$2
 
-  local filename=${path##*/}
-  local ext=${filename#*.}
-  local format=${format:-$ext}
+  if [[ $format = "auto" ]]; then
+    local filename=${path##*/}
+    local ext=${filename#*.}
+    format=$ext
+  fi
 
   local tempfile=""
 
@@ -72,7 +75,7 @@ import_from=${params[0]:-}
 if [[ $import_from ]]; then
   case $type in
     git)     init_via_git "$import_from" ;;
-    archive) init_via_archive "$import_from" ;;
+    archive) init_via_archive "$import_from" "$format";;
     *) abort "Unknown protocol '$type'"
   esac
   info "$INFILL_DIR directory imported."
