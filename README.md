@@ -249,6 +249,20 @@ esac
 .gitconfig        tmpl
 ~~~
 
+## Deployment to another computer
+
+``reno generate setup`` generates setup.sh.
+
+Run setup.sh, then installs reno and infill from online.
+
+Example
+
+```
+bash -c "$(curl -L https://example.com/path/to/your/setup.sh)"
+```
+
+setup.sh must be modified for your environment. Do NOT forget to edit.
+
 ## License
 
 MIT license

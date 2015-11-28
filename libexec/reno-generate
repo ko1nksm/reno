@@ -73,6 +73,7 @@ generate_setup() {
 
 set -eu
 
+# ---------- Edit below here ----------
 INSTALL_DIR="\$HOME/.reno"
 AUTO_INSTALL=
 AUTO_YES=
@@ -85,6 +86,8 @@ INFILL_REPOSITORY="$infill_repo"
 INSTALLER="$installer"
 INFILL_ARCHIVE="$infill_archive"
 INFILL_ARCHIVE_FORMAT="auto"
+# ---------- Edit above here ----------
+
 DATA
 cat <<'DATA'
 
