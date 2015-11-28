@@ -25,7 +25,9 @@ load_renofile_env() {
   local name=$1
   shift
 
-  local script=$(read_renofile "$name" "env") line
+  local script line
+
+  script=$(read_renofile "$name" "env")
 
   if [[ $script ]]; then
     run cd "$INFILL_DIR/$name"
@@ -48,7 +50,9 @@ run_renofile() {
   local section=$2
   shift 2
 
-  local script=$(read_renofile "$name" "$section")
+  local script
+
+  script=$(read_renofile "$name" "$section")
 
   if [[ $script ]]; then
     run cd "$INFILL_DIR/$name"

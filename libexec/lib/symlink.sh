@@ -34,7 +34,10 @@ symlink() {
 }
 
 mklink() {
-  local srcw=$(cygpath -a -w "$1")
-  local destw=$(cygpath -a -w "$2")
+  local srcw destw
+
+  srcw=$(cygpath -a -w "$1")
+  destw=$(cygpath -a -w "$2")
+
   run cmd /c "mklink /j \"$destw\" \"$srcw\"" >/dev/null
 }

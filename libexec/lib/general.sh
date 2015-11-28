@@ -12,7 +12,8 @@ readonly WHITE="\033[37m"
 readonly RESET="\033[m"
 
 copy_function() {
-  local code=$(declare -f store_shim)
+  local code
+  code=$(declare -f $1)
   eval "${code/$1 /$2 }"
 }
 
@@ -27,9 +28,9 @@ store() {
 store_shim() {
   # Do not inline quote variable
   # bash 4.2.25 is not handled correctly
+  local quote="'\''"
 
   # shellcheck disable=SC2086
-  local quote="'\''"
   eval $1="'${2//\'/$quote}'"
 }
 

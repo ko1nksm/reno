@@ -17,15 +17,16 @@ normpath() {
 }
 
 relpath() {
-  local target=$(normpath "$1")
-  local dir=$(normpath "${2:-$PWD}")
+  local target dir back=""
+
+  target=$(normpath "$1")
+  dir=$(normpath "${2:-$PWD}")
 
   if [[ $target = "$dir" ]]; then
     printf "./\n"
     return
   fi
 
-  local back=""
   while [[ $dir && $target = "${target#$dir}" ]]; do
     dir=${dir%/*}
     back="../$back"

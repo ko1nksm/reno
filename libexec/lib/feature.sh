@@ -29,14 +29,16 @@ compare_feature_file() {
   local file1=${1%/}
   local file2=${2%/}
 
+  local real1 real2 inode1 inode2 real1 real2
+
   if [[ -L $file1 || -L $file2 ]]; then
     if [[ "$file1" = "$file2" ]]; then
       echo "same"
       return 0
     fi
 
-    local real1=$(readlinkf "$file1")
-    local real2=$(readlinkf "$file2")
+    real1=$(readlinkf "$file1")
+    real2=$(readlinkf "$file2")
 
     if [[ "$real1" = "$real2" ]]; then
       echo "soft"
@@ -53,12 +55,12 @@ compare_feature_file() {
     return 1
   fi
 
-  local inode1=$(get_inode "$file1")
-  local inode2=$(get_inode "$file2")
+  inode1=$(get_inode "$file1")
+  inode2=$(get_inode "$file2")
 
   if [[ $inode1 = "$inode2" ]]; then
-    local real1=$(readlinkf "$file1")
-    local real2=$(readlinkf "$file2")
+    real1=$(readlinkf "$file1")
+    real2=$(readlinkf "$file2")
 
     if [[ "$real1" = "$real2" ]]; then
       echo "same"

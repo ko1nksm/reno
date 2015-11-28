@@ -26,7 +26,7 @@ renoattributes=$(readfile "$INFILL_DIR/$name/.renoattributes")
 while readline -u 3 file; do
   mode="soft"
   mask=""
-  src="$INFILL_DIR/$name/$file"
+  src="$INFILL_DIR/$name/${file:-}"
   dest="$HOME/$file"
 
   [[ $mode = "hard" && -d $src ]] && mode="soft"

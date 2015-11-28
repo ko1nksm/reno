@@ -23,7 +23,7 @@ run_renofile "$name" "uninstall:before" "$@"
 renoattributes=$(readfile "$INFILL_DIR/$name/.renoattributes")
 
 while readline file; do
-  src="$INFILL_DIR/$name/$file"
+  src="$INFILL_DIR/$name/${file:-}"
   dest="$HOME/$file"
 
   attr=$(attributes_matching "$file" <<< "$renoattributes")
@@ -34,7 +34,7 @@ while readline file; do
     if [[ $result ]]; then
       run rm "$dest"
     else
-      if [[ $mode = "tmpl" ]]; then
+      if [[ ${mode:-} = "tmpl" ]]; then
         if [[ "$(template "$src")" = "$(readfile "$dest")" ]]; then
           run rm "$dest"
         fi

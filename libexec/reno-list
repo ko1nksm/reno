@@ -25,9 +25,10 @@ installed_files() {
 }
 
 home_files() {
-  local list=$(find "$HOME" -type l)
-  local lines=$(( $(wc -l <<< "$list") ))
-  local file link path
+  local list lines file link path
+
+  list=$(find "$HOME" -type l)
+  lines=$(( $(wc -l <<< "$list") ))
 
   local i=0 seconds=$SECONDS
   local msg="Checking symbolic link in home. take a few seconds."
