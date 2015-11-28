@@ -4,7 +4,7 @@ cp -a "$BATS_TEST_DIRNAME/fixture/home" "$TEST_HOME"
 
 export HOME=$TEST_HOME
 export RENO_DIR="$BATS_TEST_DIRNAME/../"
-export PATH="$BATS_TEST_DIRNAME/../libexec:$BATS_TEST_DIRNAME/helper:$PATH"
+export PATH="$RENO_DIR/bin:$BATS_TEST_DIRNAME/../libexec:$BATS_TEST_DIRNAME/helper:$PATH"
 
 export INFILL_DIR=$(reno env INFILL_DIR)
 export INFILL_VAR_DIR=$(reno env INFILL_VAR_DIR)
