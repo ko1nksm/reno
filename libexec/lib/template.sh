@@ -1,7 +1,6 @@
 template() {
   local src=$1
   local dest=${2:-}
-  local data
 
   import "mo"
 

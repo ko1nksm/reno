@@ -25,8 +25,8 @@ if [ "${0##*/}" != "reno-properties" ]; then
 
   info() {
     echo
-    echo "  Reno directory: $RENO_DIR"
-    echo "  Reno command  : $RENO_BIN"
+    echo "  Reno directory: ${RENO_DIR:-}"
+    echo "  Reno command  : ${RENO_BIN:-}"
     echo
   }
 

@@ -11,9 +11,11 @@ winsymlinks() {
 
 case $(uname -a) in
   *[[:space:]]Msys*)
-    export MSYS=$(winsymlinks "${MSYS:-}")
+    export MSYS
+    MSYS=$(winsymlinks "${MSYS:-}")
     ;;
   *[[:space:]]Cygwin*)
-    export CYGWIN=$(winsymlinks "${CYGWIN:-}")
+    export CYGWIN
+    CYGWIN=$(winsymlinks "${CYGWIN:-}")
     ;;
 esac

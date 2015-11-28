@@ -17,12 +17,14 @@ case $RENO_SUPPORT_CMP in
     ;;
   md5sum)
     cmpfile() {
-      local size1=$(get_filesize "$1")
-      local size2=$(get_filesize "$2")
+      local size1 size2 sum1 sum2
+
+      size1=$(get_filesize "$1")
+      size2=$(get_filesize "$2")
 
       if (( size1 = size2 )); then
-        local sum1=$(md5sum "$1")
-        local sum2=$(md5sum "$2")
+        sum1=$(md5sum "$1")
+        sum2=$(md5sum "$2")
         [[ "${sum1%% *}" = "${sum2%% *}" ]] && return 0
       fi
 
@@ -44,14 +46,15 @@ case $RENO_SUPPORT_DIFF in
     ;;
   bash)
     cmpdir() {
+      local list1 list2 line
+
       [[ -d $1 && -d $2 ]] || return 1
 
-      local list1=$(cd "$1"; find . -type f | sort)
-      local list2=$(cd "$2"; find . -type f | sort)
+      list1=$(cd "$1"; find . -type f | sort)
+      list2=$(cd "$2"; find . -type f | sort)
 
       [[ "$list1" = "$list2" ]] || return 1
 
-      local line
       while readline line; do
         line=${line:2}
         cmpfile "$1/$line" "$2/$line" || return 1

@@ -36,9 +36,10 @@ INFILL_DIR=$(normpath "$INFILL_DIR")
 
 # non-overridable variable
 export RENO_DRY_RUN=""
-export RENO_TIME=$(date "+%Y%m%d%H%M%S")
 export RENO_DEPTH_OF_RECURSION=0
 export INFILL_INSTALLED_DIR="$INFILL_VAR_DIR/installed"
+export RENO_TIME
+RENO_TIME=$(date "+%Y%m%d%H%M%S")
 
 if [[ $INFILL_BASE = */* ]]; then
   abort "\$INFILL_BASE not allow slash."

@@ -55,10 +55,12 @@ DATA
 }
 
 generate_setup() {
-  local reno_repo=$(reno-properties REPOSITORY)
+  local reno_repo installer
   local infill_repo="YOUR-INFILL-REPOSITORY"
   local infill_archive="YOUR-INFILL-ARCHIVE"
-  local installer=$(reno-properties INSTALLER)
+
+  reno_repo=$(reno-properties REPOSITORY)
+  installer=$(reno-properties INSTALLER)
 
   if ! exists git; then
     warn "infill repository not detected. [git not found]"

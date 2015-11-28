@@ -13,7 +13,8 @@ extract() {
   esac
   exists "$command" || abort "$command is required."
 
-  local tmpdir=$(mktemp -d)
+  local tmpdir
+  tmpdir=$(mktemp -d)
   case $format in
     zip) run unzip "$filename" -d "$tmpdir" ;;
     tar.gz) run tar zxf "$filename" -C "$tmpdir" ;;
