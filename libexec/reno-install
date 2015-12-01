@@ -41,15 +41,16 @@ while readline -u 3 file; do
         if [[ $mode = "tmpl" ]]; then
           if [[ "$(template "$src")" = "$(readfile "$dest")" ]]; then
             mode="skip"
-            break
           fi
         fi
 
-        reno-yesno "Replace to a file/directory in infill? [$dest]" || continue
-        if [[ $INFILL_BACKUP_DIR ]]; then
-          backup_dir="$INFILL_BACKUP_DIR/$RENO_TIME"
-          run mkdir "$backup_dir"
-          run mv "$dest" "$backup_dir/$file"
+        if [[ $mode != "skip" ]]; then
+          reno-yesno "Replace to a file/directory in infill? [$dest]" || continue
+          if [[ $INFILL_BACKUP_DIR ]]; then
+            backup_dir="$INFILL_BACKUP_DIR/$RENO_TIME"
+            run mkdir "$backup_dir"
+            run mv "$dest" "$backup_dir/$file"
+          fi
         fi
         ;;
       same)
