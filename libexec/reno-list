@@ -118,7 +118,6 @@ get_info() {
 infill_name=${INFILL_DIR#$HOME/}
 
 files=$(
-  set -e
   if [[ -d $INFILL_INSTALLED_DIR ]]; then installed_files; fi
   if [[ $check ]]; then home_files; fi
 )
