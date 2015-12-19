@@ -117,8 +117,8 @@ else
   else
     echo -n "Git not found. Do you want to import from an archive? [y/N] "
     read input
+    [[ $input = "y" || $input = "Y" ]] || exit 1
   fi
-  [[ $input = "y" || $input = "Y" ]] || exit 1
 
   if type curl > /dev/null 2>&1; then
     bash -c "$(curl -L $INSTALLER)"
