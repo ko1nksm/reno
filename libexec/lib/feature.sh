@@ -1,14 +1,14 @@
 import "renoignore" "symlink" "cmp"
 
 find_feature_files() {
-  local name dir ignore="" file
+  local name prefix ignore="" file
 
   if [[ $1 = "--full" ]]; then
     name=$2
-    dir="$INFILL_DIR/$2/"
+    prefix="$INFILL_DIR/$2/"
   else
     name=$1
-    dir=""
+    prefix=""
   fi
 
   ignore=$(readfile "$INFILL_DIR/.renoignore" "$INFILL_DIR/$name/.renoignore")
@@ -20,30 +20,31 @@ find_feature_files() {
       case $file in
         "" | Renofile | .renoignore | .renoattributes) ;;
         *)
-        _find_feature_files "$file" "$ignore"
+        _find_feature_files "$prefix" "$file" "$ignore"
       esac
     done < <(find . -maxdepth 1 -follow)
   )
 }
 
 _find_feature_files() {
-  local file=$1
-  local ignore=$2
+  local prefix=$1
+  local file=$2
+  local ignore=$3
   local dir
 
   if [[ -d $file ]]; then
     dir=$file
     if  ! ignore_matching "$dir/" <<< "$ignore"; then
-      puts "$dir"
+      puts "$prefix$dir"
     fi
     ignore_matching "$dir" <<< "$ignore" && return 0
     while readline file; do
       [[ $file = "$dir" ]] && continue
-      _find_feature_files "$file" "$ignore"
+      _find_feature_files "$prefix" "$file" "$ignore"
     done < <(find "$dir" -maxdepth 1 -follow)
   else
     ignore_matching "$file" <<< "$ignore" && return 0
-    puts "$file"
+    puts "$prefix$file"
   fi
 }
 
