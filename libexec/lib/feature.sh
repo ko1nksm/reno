@@ -13,16 +13,38 @@ find_feature_files() {
 
   ignore=$(readfile "$INFILL_DIR/.renoignore" "$INFILL_DIR/$name/.renoignore")
 
-  while readline file; do
-    file=${file:2}
-    case $file in
-      "" | Renofile | .renoignore | .renoattributes) ;;
-      *)
-        [[ -d "$INFILL_DIR/$name/$file" ]] && text="$file/" || text=$file
-        ignore_matching "$text" <<< "$ignore" && continue
-        puts "$dir$file"
-    esac
-  done < <(cd "$INFILL_DIR/$name"; find . -follow)
+  (
+    cd "$INFILL_DIR/$name"
+    while readline file; do
+      file=${file:2}
+      case $file in
+        "" | Renofile | .renoignore | .renoattributes) ;;
+        *)
+        _find_feature_files "$file" "$ignore"
+      esac
+    done < <(find . -maxdepth 1 -follow)
+  )
+}
+
+_find_feature_files() {
+  local file=$1
+  local ignore=$2
+  local dir
+
+  if [[ -d $file ]]; then
+    dir=$file
+    if  ! ignore_matching "$dir/" <<< "$ignore"; then
+      puts "$dir"
+    fi
+    ignore_matching "$dir" <<< "$ignore" && return 0
+    while readline file; do
+      [[ $file = "$dir" ]] && continue
+      _find_feature_files "$file" "$ignore"
+    done < <(find "$dir" -maxdepth 1 -follow)
+  else
+    ignore_matching "$file" <<< "$ignore" && return 0
+    puts "$file"
+  fi
 }
 
 compare_feature_file() {
