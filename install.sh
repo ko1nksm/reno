@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-readonly VERSION="0.1.2"
+readonly VERSION="0.1.3"
 readonly PROJECT="https://github.com/ko1nksm/reno"
 readonly REPOSITORY="https://github.com/ko1nksm/reno.git"
 readonly ARCHIVE="https://github.com/ko1nksm/reno/archive/master.tar.gz"
