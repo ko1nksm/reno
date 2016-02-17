@@ -48,8 +48,9 @@ while readline -u 3 file; do
           reno-yesno "Replace to a file/directory in infill? [$dest]" || continue
           if [[ $INFILL_BACKUP_DIR ]]; then
             backup_dir="$INFILL_BACKUP_DIR/$RENO_TIME"
-            run mkdir "$backup_dir"
-            run mv "$dest" "$backup_dir/$file"
+            target_path="$backup_dir/$file"
+            run mkdir "${target_path%/*}"
+            run mv "$dest" "$target_path"
           fi
         fi
         ;;
