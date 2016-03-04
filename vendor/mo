@@ -259,13 +259,6 @@ moIndirect() {
     printf -v "$1" '%s' "$2"
 }
 
-if ! printf -v _ "" 2>/dev/null; then
-    moIndirect() {
-        unset -v "$1"
-        eval $1="'${2//\'/"'\''"}'"
-    }
-fi
-
 
 # Internal: Send an array as a variable up to caller of a function
 #
@@ -334,7 +327,7 @@ moIsFunction() {
     functionList=$(declare -F)
     functionList=( ${functionList//declare -f /} )
 
-    for functionName in ${functionList[@]}; do
+    for functionName in "${functionList[@]}"; do
         if [[ "$functionName" == "$1" ]]; then
             return 0
         fi
@@ -445,18 +438,16 @@ moLoadFile() {
 #
 # Returns nothing.
 moLoop() {
-    local content context contextBase index
+    local content context contextBase
 
     content=$1
     contextBase=$2
     shift 2
 
-    index=0
     while [[ "${#@}" -gt 0 ]]; do
-        moFullTagName context "$contextBase" "$index"
+        moFullTagName context "$contextBase" "$1"
         moParse "$content" "$context" false
         shift
-        let index+=1
     done
 }
 
@@ -500,7 +491,7 @@ moParse() {
                         moParse "$moContent" "$moCurrent" false
                         moContent="${moBlock[2]}"
                     elif moIsArray "$moTag"; then
-                        eval 'moLoop "${moBlock[0]}" "$moTag" "${'"$moTag"'[@]}"'
+                        eval 'moLoop "${moBlock[0]}" "$moTag" "${!'"$moTag"'[@]}"'
                     else
                         moParse "${moBlock[0]}" "$moCurrent" false
                     fi
@@ -829,7 +820,7 @@ moTrimWhitespace() {
 #
 # Returns nothing.
 moUsage() {
-    grep '^#/' < "$1" | cut -c 4-
+    grep '^#/' "$1" | cut -c 4-
 }
 
 
