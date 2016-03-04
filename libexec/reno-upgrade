@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+. bootstrap
+
+set -eu
+
+cd "$RENO_DIR"
+
+exists git || abort "Requires git for update"
+[[ -d .git ]] || abort "$RENO_DIR is not managed by git."
+
+git pull

@@ -10,6 +10,7 @@ Usage: reno COMMAND [OPTIONS]
 COMMAND:
   init          Initialize infill directory
   generate      Generate file to infill directory
+  update        Update infill directory
 
   install       Install feature
   uninstall     Uninstall feature
@@ -17,6 +18,7 @@ COMMAND:
   info          Show infill information
   list          List installed files
 
+  upgrade       Upgrade reno
   env           Show reno environment variables
   help          Display command's help
 
@@ -58,6 +60,13 @@ OPTIONS:
   -y, --yes             Assume Yes to all queries
       --dry-run         Dry run and verbose
   -q, --quiet           Quiet
+DATA
+}
+
+help_update() {
+cat <<DATA
+Usage: reno update
+  Update infill directory
 DATA
 }
 
@@ -110,6 +119,13 @@ Usage: reno list [OPTIONS]
 OPTIONS:
   -c, --check           Check home directory (may take a few seconds)
   -f, --full            Display full path
+DATA
+}
+
+help_upgrade() {
+cat <<DATA
+Usage: reno upgrade
+  Upgrade reno
 DATA
 }
 
