@@ -2,11 +2,18 @@
 
 . bootstrap
 
-set -eu
+import "infill" "renofile"
 
 cd "$INFILL_DIR"
 
+info "update $INFILL_DIR"
 exists git || abort "Requires git for update"
 [[ -d .git ]] || abort "$INFILL_DIR is not managed by git."
 
 git pull
+
+while readline name; do
+  is_installed "$name" || continue
+  info "update $name"
+  run_renofile "$name" "update" "$@"
+done < <(list_infill --feature)
