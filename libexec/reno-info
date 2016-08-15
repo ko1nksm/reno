@@ -47,7 +47,7 @@ if [[ ! ${1:-} ]]; then
   echo "- -------------------- -------- ----------- --------------- -----"
 
   while readline name; do
-    [[ -f "$INFILL_INSTALLED_DIR/$name" ]] &&:
+    is_installed "$name" &&:
     dispif "%s " "*" " "
     printf "%-20s " "$name"
     [[ -e "$name/Renofile" ]] &&:
