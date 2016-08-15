@@ -79,7 +79,6 @@ NAME:
   feature or group name
 
 OPTIONS:
-  -u, --upgrade         Upgrade feature (Set RENO_UPGRADE=1)
   -y, --yes             Assume Yes to all queries
       --dry-run         Dry run and verbose
   -q, --quiet           Quiet

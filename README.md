@@ -132,14 +132,15 @@ For installation of the application, write script.
 # Run when reno install
 if [[ ! -e ~/.rbenv ]]; then
   git clone https://github.com/sstephenson/rbenv.git ~/.rbenv
-elif [[ $RENO_UPGRADE ]]; then
-  git -C ~/.rbenv pull
 fi
 
 [install:before]
 # Before installing files (same as install)
 [install:after]
 # After installing files
+
+[update]
+git -C ~/.rbenv pull
 
 [uninstall]
 # Run when reno uninstall

@@ -23,7 +23,6 @@ disp s e MSYS
 disp s e CYGWIN
 disp
 disp - - RENO_DIR
-disp - - RENO_UPGRADE
 disp - - RENO_YES
 disp s - RENO_DRY_RUN
 disp - - RENO_QUIET
