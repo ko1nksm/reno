@@ -17,5 +17,5 @@ while readline name; do
   is_installed "$name" || continue
   info "update $name"
   load_renofile_env "$name"
-  run_renofile "$name" "update" "$@"
+  run_renofile "$name" "update"
 done < <(list_infill --feature)
