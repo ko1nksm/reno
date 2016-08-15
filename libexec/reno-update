@@ -13,6 +13,7 @@ exists git || abort "Requires git for update"
 git pull
 
 while readline name; do
+  # shellcheck disable=SC2154
   is_installed "$name" || continue
   info "update $name"
   load_renofile_env "$name"
