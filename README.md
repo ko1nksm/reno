@@ -126,7 +126,7 @@ For installation of the application, write script.
 
 ```
 [env]
-# Run when reno install / uninstall / list (for file check)
+# Run when reno install / update / uninstall / list (for file check)
 
 [install]
 # Run when reno install
@@ -140,6 +140,7 @@ fi
 # After installing files
 
 [update]
+# Run when reno update
 git -C ~/.rbenv pull
 
 [uninstall]
