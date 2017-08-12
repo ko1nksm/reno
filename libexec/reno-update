@@ -12,10 +12,19 @@ exists git || abort "Requires git for update"
 
 git pull
 
-while readline name; do
-  # shellcheck disable=SC2154
-  is_installed "$name" || continue
-  info "update $name"
-  load_renofile_env "$name"
-  run_renofile "$name" "update"
-done < <(list_infill --feature)
+if [[ ! ${1:-} ]]; then
+  while readline name; do
+    # shellcheck disable=SC2154
+    is_installed "$name" || continue
+    info "update $name"
+    load_renofile_env "$name"
+    run_renofile "$name" "update"
+  done < <(list_infill --feature)
+else
+  for name in "$@"; do
+    is_installed "$name" || abort "Not installed feature '$name'"
+    info "update $name"
+    load_renofile_env "$name"
+    run_renofile "$name" "update"
+  done
+fi
