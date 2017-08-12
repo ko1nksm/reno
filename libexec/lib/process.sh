@@ -14,6 +14,11 @@ verbose() {
   fi
 }
 
+quit() {
+  [[ ${RENO_QUIET:-} ]] || echo -e "reno: $*"
+  exit 0
+}
+
 abort() {
   echo -e "${RED}reno: [error] ${*}${RESET}" >&2
   exit 1

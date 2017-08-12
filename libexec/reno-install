@@ -8,6 +8,7 @@ name=$1
 shift
 
 exists_feature "$name" || abort "Not found feature '$name'"
+is_installed "$name" && quit "Already installed feature '$name'"
 
 for option in "$@"; do
   case $option in
