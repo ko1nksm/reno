@@ -1,3 +1,5 @@
+**Note: Currently maintenance is paused. I plan to re-implement it as POSIX Shell script (not bash)**
+
 # Renovating your home with reno.
 
 Reno is the home directory management tool.
